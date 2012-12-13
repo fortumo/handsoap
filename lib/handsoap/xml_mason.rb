@@ -81,11 +81,12 @@ module Handsoap
       def defines_namespace?(prefix)
         false
       end
+
       def to_s
         if @document_element.nil?
           raise "No document element added."
         end
-        (@xml_header ? "<?xml version='1.0' ?>\n" : "") + @document_element.to_s
+        (@xml_header ? "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" : "") + @document_element.to_s
       end
     end
 
