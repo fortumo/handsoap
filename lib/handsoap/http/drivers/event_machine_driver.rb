@@ -10,7 +10,11 @@ module Handsoap
         end
 
         def send_http_request_async(request)
-          emr = EventMachine::HttpRequest.new(request.url)
+          emr = EventMachine::HttpRequest.new(
+            request.url,
+            :connect_timeout => request.timeout,
+            :inactivity_timeout => request.timeout
+          )
 
           if request.username && request.password
             # TODO: Verify that this is actually supported?

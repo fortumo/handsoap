@@ -281,7 +281,7 @@ module Handsoap
         elsif options[:soap_action] == :none
           options[:soap_action] = nil
         end
-        doc = make_envelope do |body|
+        doc = make_envelope do |body, header|
           body.add action
         end
         dispatcher.request_block.call doc.find(action)
@@ -291,7 +291,7 @@ module Handsoap
         }
         headers["SOAPAction"] = options[:soap_action] unless options[:soap_action].nil?
         on_before_dispatch
-        request = make_http_request(self.uri, doc.to_s, headers)
+        request = make_http_request(self.uri, doc.to_s, headers, options[:http_options]))
         driver = self.http_driver_instance
         if driver.respond_to? :send_http_request_async
           deferred = driver.send_http_request_async(request)
@@ -407,8 +407,11 @@ module Handsoap
         request.set_trust_ca_file(http_options[:trust_ca_file]) if http_options[:trust_ca_file]
         request.set_client_cert_files(http_options[:client_cert_file], http_options[:client_cert_key_file]) if http_options[:client_cert_file] && http_options[:client_cert_key_file]
         request.set_ssl_verify_mode(http_options[:ssl_verify_mode]) if http_options[:ssl_verify_mode]
+        request.timeout = http_options[:timeout]
       end
-      
+
+      request.timeout ||= 60
+
       headers.each do |key, value|
         request.add_header(key, value)
       end
