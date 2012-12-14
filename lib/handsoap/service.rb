@@ -198,7 +198,7 @@ module Handsoap
       self.class.request_content_type
     end
     def uri
-      self.class.uri
+      @uri || self.class.uri
     end
     def http_driver_instance
       Handsoap::Http.drivers[Handsoap.http_driver].new
@@ -228,7 +228,7 @@ module Handsoap
           if options[:soap_header]
             iterate_hash_array(header, options[:soap_header])
           end
-          
+
           if options[:soap_body]
             action_hash = { action => options[:soap_body] }
             iterate_hash_array(body, action_hash)
@@ -239,13 +239,14 @@ module Handsoap
         if block_given?
           yield doc.find(action)
         end
+        on_after_create_document(doc)
         # ready to dispatch
         headers = {
           "Content-Type" => "#{self.request_content_type}; charset=UTF-8"
         }
         headers["SOAPAction"] = options[:soap_action] unless options[:soap_action].nil?
         on_before_dispatch
-        request = make_http_request(self.uri, doc.to_s, headers, options[:http_options])
+        request = make_http_request(uri, doc.to_s, headers, options[:http_options])
         response = http_driver_instance.send_http_request(request)
         parse_http_response(response)
       end
@@ -348,6 +349,11 @@ module Handsoap
     #
     # You can override this to add namespaces and other elements that are common to all requests (Such as authentication).
     def on_create_document(doc)
+    end
+    # Hook that is called when after request document is created.
+    #
+    # You can override this to add data that is derived from already created document (Such signature headers).
+    def on_after_create_document(doc)
     end
     # Hook that is called before the message is dispatched.
     #
