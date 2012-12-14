@@ -292,7 +292,7 @@ module Handsoap
         }
         headers["SOAPAction"] = options[:soap_action] unless options[:soap_action].nil?
         on_before_dispatch
-        request = make_http_request(self.uri, doc.to_s, headers, options[:http_options]))
+        request = make_http_request(uri, doc.to_s, headers, options[:http_options])
         driver = self.http_driver_instance
         if driver.respond_to? :send_http_request_async
           deferred = driver.send_http_request_async(request)
